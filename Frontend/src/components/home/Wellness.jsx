@@ -1,11 +1,13 @@
 import React, { useRef } from 'react';
 import { useCart } from '@/lib/cart/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const multivitaminLink = 'https://th.bing.com/th/id/OIP.VKOxY2W35pJm1-5ltV-K_gHaHa?w=177&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3';
 
 const Wellness = () => {
   const trackRef = useRef(null);
   const { addItem } = useCart();
+  const navigate = useNavigate();
 
   const items = Array.from({ length: 9 }, (_, i) => ({
     id: `wellness-${i}`,
@@ -70,7 +72,12 @@ const Wellness = () => {
         </div>
         {/* View All */}
         <div className="mt-8 flex justify-center">
-          <button className="bg-black font-bold text-white px-6 py-2 rounded-full focus:outline-none">View All</button>
+          <button
+            className="bg-black font-bold text-white px-6 py-2 rounded-full focus:outline-none"
+            onClick={() => navigate('/wellness')}
+          >
+            View All
+          </button>
         </div>
       </div>
     </section>

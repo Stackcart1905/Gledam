@@ -1,5 +1,6 @@
 import React, { useRef, useState } from 'react';
 import { useCart } from '@/lib/cart/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const categories = [
   { key: 'bestseller', label: 'bestseller' },
@@ -77,6 +78,7 @@ const TalkOfTheTown = () => {
   const [active, setActive] = useState('bestseller');
   const trackRef = useRef(null);
   const { addItem } = useCart();
+  const navigate = useNavigate();
 
   const proteinItems = buildProteinItems(6);
   const creatineItems = buildCreatineItems(6);
@@ -116,7 +118,7 @@ const TalkOfTheTown = () => {
 
   return (
     <section className="w-full bg-white">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
         {/* Heading */}
         <div className="mb-6">
           <h2 className="text-4xl font-bold tracking-tight">
@@ -197,7 +199,12 @@ const TalkOfTheTown = () => {
 
         {/* View All */}
         <div className="mt-8 flex justify-center">
-          <button className="bg-black font-bold text-white px-6 py-2 rounded-full focus:outline-none">View All</button>
+          <button
+            className="bg-black font-bold text-white px-6 py-2 rounded-full focus:outline-none"
+            onClick={() => navigate('/trending')}
+          >
+            View All
+          </button>
         </div>
       </div>
     </section>

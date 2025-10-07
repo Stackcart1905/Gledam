@@ -1,6 +1,31 @@
-import React from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 const ChatbotPanel = ({ open, onClose }) => {
+  const [messages, setMessages] = useState([
+    { role: 'assistant', text: 'Hey 👋 I am your Fitness Expert 😊 💪.' },
+    { role: 'assistant', text: 'You can ask me anything in any language' },
+  ]);
+  const [input, setInput] = useState('');
+  const listRef = useRef(null);
+
+  const canSend = useMemo(() => input.trim().length > 0, [input]);
+
+  const sendMessage = (text) => {
+    const content = (text ?? input).trim();
+    if (!content) return;
+    setMessages((prev) => [
+      ...prev,
+      { role: 'user', text: content },
+      // Placeholder bot response – replace with real API later
+      { role: 'assistant', text: "Thanks! I'm here to help." },
+    ]);
+    setInput('');
+    // Scroll to bottom after a tick
+    setTimeout(() => {
+      if (listRef.current) listRef.current.scrollTop = listRef.current.scrollHeight;
+    }, 0);
+  };
+
   if (!open) return null;
 
   return (
@@ -9,10 +34,10 @@ const ChatbotPanel = ({ open, onClose }) => {
         position: 'fixed',
         left: '1rem',
         bottom: '1.5rem',
-        top: '5rem', 
+        top: '5rem',
         zIndex: 1100,
-        width: '380px',
-        maxWidth: '90vw',
+        width: 'min(380px, 92vw)',
+        maxWidth: '92vw',
         display: 'flex',
         flexDirection: 'column',
         background: '#ffffff',
@@ -74,20 +99,33 @@ const ChatbotPanel = ({ open, onClose }) => {
       </div>
 
       {/* Messages */}
-      <div style={{ flex: 1, padding: '14px 16px', overflowY: 'auto', background: '#fafafa' }}>
-        <div
-          style={{
-            background: '#fff',
-            borderRadius: 12,
-            padding: '12px 14px',
-            boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
-            maxWidth: '90%',
-            fontSize: '14px',
-          }}
-        >
-          <div>Hey 👋 I am your Fitness Expert 😊 💪.</div>
-          <div>You can ask me anything in any language</div>
-        </div>
+      <div ref={listRef} style={{ flex: 1, padding: '14px 16px', overflowY: 'auto', background: '#fafafa' }}>
+        {messages.map((m, idx) => (
+          <div
+            key={idx}
+            style={{
+              display: 'flex',
+              justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start',
+              marginBottom: 10,
+            }}
+          >
+            <div
+              style={{
+                background: m.role === 'user' ? '#111' : '#fff',
+                color: m.role === 'user' ? '#fff' : '#111',
+                borderRadius: 12,
+                padding: '10px 12px',
+                boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
+                maxWidth: '85%',
+                fontSize: '14px',
+                whiteSpace: 'pre-wrap',
+                wordBreak: 'break-word',
+              }}
+            >
+              {m.text}
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Quick suggestions at the bottom */}
@@ -107,6 +145,7 @@ const ChatbotPanel = ({ open, onClose }) => {
         ].map((t, i) => (
           <button
             key={i}
+            onClick={() => sendMessage(t)}
             style={{
               background: '#fff',
               border: '1px solid #e5e7eb',
@@ -116,6 +155,7 @@ const ChatbotPanel = ({ open, onClose }) => {
               boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
               alignSelf: 'flex-end',
               fontSize: '14px',
+              cursor: 'pointer',
             }}
           >
             {t}
@@ -123,20 +163,61 @@ const ChatbotPanel = ({ open, onClose }) => {
         ))}
       </div>
 
-      {/* Input */}
+      {/* Input with send icon button */}
       <div style={{ padding: 12, borderTop: '1px solid #eee', background: '#fff' }}>
-        <input
-          type="text"
-          placeholder="Ask me anything"
-          style={{
-            width: '100%',
-            padding: '12px 14px',
-            borderRadius: 12,
-            border: '1px solid #e5e7eb',
-            outline: 'none',
-            fontSize: 14,
-          }}
-        />
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
+            placeholder="Ask me anything"
+            style={{
+              width: '100%',
+              padding: '12px 80px 12px 14px', // space for the SEND button on right
+              borderRadius: 12,
+              border: '1px solid #e5e7eb',
+              outline: 'none',
+              fontSize: 14,
+            }}
+            aria-label="Message input"
+          />
+          <button
+            onClick={() => sendMessage()}
+            disabled={!canSend}
+            aria-label="Send message"
+            style={{
+              position: 'absolute',
+              right: 6,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              height: 34,
+              minWidth: 64,
+              padding: '0 12px',
+              borderRadius: 8,
+              border: '1px solid #e5e7eb',
+              background: canSend ? '#111' : '#f3f4f6',
+              color: canSend ? '#fff' : '#9ca3af',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              lineHeight: 0,
+              cursor: canSend ? 'pointer' : 'not-allowed',
+            }}
+          >
+            <span style={{
+              fontSize: 12,
+              fontWeight: 700,
+              letterSpacing: 0.5,
+              textTransform: 'uppercase'
+            }}>Send</span>
+          </button>
+        </div>
         <div style={{ textAlign: 'center', marginTop: 8, fontSize: 11, color: '#9ca3af' }}>
           Powered by <strong>Verifast</strong>
         </div>

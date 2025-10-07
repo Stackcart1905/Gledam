@@ -25,8 +25,8 @@ const Footer = () => {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-10 lg:gap-12">
           {/* For Customer */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">For Customer</h3>
-            <ul className="space-y-2 text-gray-300 text-md">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">For Customer</h3>
+            <ul className="space-y-1 sm:space-y-2 text-gray-300 text-sm sm:text-base">
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">About Us</a></li>
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">Gledam Cash</a></li>
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">Refer and Earn</a></li>
@@ -37,8 +37,8 @@ const Footer = () => {
 
           {/* Product */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Product</h3>
-            <ul className="space-y-2 text-gray-300 text-md">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Product</h3>
+            <ul className="space-y-1 sm:space-y-2 text-gray-300 text-sm sm:text-base">
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">Protein</a></li>
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">Gainer</a></li>
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">Creatine</a></li>
@@ -49,8 +49,8 @@ const Footer = () => {
 
           {/* Explore */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Explore</h3>
-            <ul className="space-y-2 text-gray-300 text-md">
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Explore</h3>
+            <ul className="space-y-1 sm:space-y-2 text-gray-300 text-sm sm:text-base">
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">Blogs</a></li>
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">LabReports</a></li>
               <li><a href="#" className="!text-white visited:!text-white hover:!text-white focus:!text-white active:!text-white focus-visible:!text-white no-underline">Track Order</a></li>
@@ -59,7 +59,7 @@ const Footer = () => {
 
           {/* Connect us */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Connect us</h3>
+            <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Connect us</h3>
             <div className="flex items-center gap-4">
               <a href="#" aria-label="Facebook" className="p-2 rounded-full bg-white/10 hover:bg-white/20 !text-white">
                 <FaFacebookF className="h-5 w-5" />

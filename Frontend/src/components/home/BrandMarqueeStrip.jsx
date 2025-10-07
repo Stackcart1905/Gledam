@@ -28,22 +28,22 @@ const BrandMarqueeStrip = () => {
           }}
         >
           <span
-            className="px-6 font-extrabold leading-none"
+            className="px-3 sm:px-6 font-extrabold leading-none"
             style={{
               color: '#CCFF00',
               WebkitTextStroke: '1px #000',
-              fontSize: '80px',
+              fontSize: 'clamp(32px, 8vw, 80px)',
               opacity: 0.35,
             }}
           >
             {REPEAT}
           </span>
           <span
-            className="px-6 font-bold leading-none"
+            className="px-3 sm:px-6 font-bold leading-none"
             style={{
               color: '#CCFF00',
               WebkitTextStroke: '1px #000',
-              fontSize: '80px',
+              fontSize: 'clamp(32px, 8vw, 80px)',
               opacity: 0.35,
             }}
           >
@@ -62,10 +62,10 @@ const BrandMarqueeStrip = () => {
             width: 'max-content',
           }}
         >
-          <span className="px-6 font-black text-black leading-none" style={{ fontSize: '80px' }}>
+          <span className="px-3 sm:px-6 font-black text-black leading-none" style={{ fontSize: 'clamp(32px, 8vw, 80px)' }}>
             {REPEAT}
           </span>
-          <span className="px-6 font-black text-black leading-none" style={{ fontSize: '80px' }}>
+          <span className="px-3 sm:px-6 font-black text-black leading-none" style={{ fontSize: 'clamp(32px, 8vw, 80px)' }}>
             {REPEAT}
           </span>
         </div>

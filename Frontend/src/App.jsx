@@ -9,6 +9,10 @@ import { Routes, Route } from 'react-router-dom'
 import Home from '@/pages/Home'
 import Authenticator from '@/pages/Authenticator'
 import About from '@/components/about/About';
+import TrendingSupplement from '@/pages/TrendingSupplement';
+import WellnessPage from '@/pages/Wellness';
+import MostLovedBestsellersPage from '@/pages/MostLovedBestsellers';
+import ApparelandAccessoriesPage from '@/pages/ApparelandAccessories';
 
 function App() {
   const [count, setCount] = useState(0)
@@ -20,6 +24,10 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/authenticator" element={<Authenticator />} />
         <Route path="/about" element={<About />} />
+        <Route path="/trending" element={<TrendingSupplement />} />
+        <Route path="/wellness" element={<WellnessPage />} />
+        <Route path="/most-loved-bestsellers" element={<MostLovedBestsellersPage />} />
+        <Route path="/apparel-accessories" element={<ApparelandAccessoriesPage />} />
       </Routes>
       <WhatsappFloatingButton />
     </>
