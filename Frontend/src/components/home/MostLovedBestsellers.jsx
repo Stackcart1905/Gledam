@@ -1,5 +1,6 @@
 import React, { useRef } from 'react';
 import { useCart } from '@/lib/cart/CartContext';
+import { useNavigate } from 'react-router-dom';
 
 const proteinLink =
   'https://www.bing.com/images/search?view=detailV2&ccid=2MRzMtHa&id=4BA3809F1ED480410C855757C265068F18F3B0BE&thid=OIP.2MRzMtHaA4DVmDzWH_1K8AHaHg&mediaurl=https%3a%2f%2fonemg.gumlet.io%2fl_watermark_346%2cw_690%2ch_700%2fa_ignore%2cw_690%2ch_700%2cc_pad%2cq_auto%2cf_auto%2fc4b851abdaa14773afe44eff17ca655f.jpg&exph=700&expw=690&q=beastlife+products&FORM=IRPRST&ck=393C57511AAAE8C9D444AEB968863C2E&selectedIndex=5&itb=1';
@@ -22,6 +23,7 @@ const creatineSrc = resolveImageSrc(creatineLink);
 const MostLovedBestsellers = () => {
   const trackRef = useRef(null);
   const { addItem } = useCart();
+  const navigate = useNavigate();
 
   const items = Array.from({ length: 9 }, (_, i) => ({
     id: `ml-${i}`,
@@ -37,9 +39,9 @@ const MostLovedBestsellers = () => {
 
   return (
     <section className="w-full bg-white">
-      <div className="w-full px-4 sm:px-6 lg:px-8 py-10">
-        <div className="mb-6">
-          <h2 className="text-4xl font-bold tracking-tight">
+      <div className="w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
+        <div className="mb-4 sm:mb-6">
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight">
             <span style={{ color: '#CCFF00' }}>|</span> <span className="text-black">Most Loved Bestsellers</span>
           </h2>
         </div>
@@ -47,7 +49,7 @@ const MostLovedBestsellers = () => {
         <div className="relative">
           <div
             ref={trackRef}
-            className="flex gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory"
+            className="flex gap-3 sm:gap-4 lg:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2"
             style={{ scrollBehavior: 'smooth' }}
           >
             {items.map((item, idx) => {
@@ -89,7 +91,12 @@ const MostLovedBestsellers = () => {
         </div>
 
         <div className="mt-8 flex justify-center">
-          <button className="bg-black font-bold text-white px-6 py-2 rounded-full focus:outline-none">View All</button>
+          <button
+            className="bg-black font-bold text-white px-6 py-2 rounded-full focus:outline-none"
+            onClick={() => navigate('/most-loved-bestsellers')}
+          >
+            View All
+          </button>
         </div>
       </div>
     </section>

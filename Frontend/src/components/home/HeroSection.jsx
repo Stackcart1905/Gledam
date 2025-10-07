@@ -25,8 +25,8 @@ const HeroSection = () => {
   return (
     <section className="w-full text-white select-none">
       {/* Height ~2.5x-3x of navbar (navbar ~64px) */}
-      <div className="relative overflow-hidden bg-gray-800" style={{}}>
-  <div className="min-h-[320px] sm:min-h-[384px] w-full">
+      <div className="relative overflow-hidden bg-gray-800">
+        <div className="min-h-[280px] sm:min-h-[320px] md:min-h-[384px] lg:min-h-[440px] w-full">
           {/* Slider track */}
           <div
             className="flex w-[200%] transition-transform duration-700 ease-out"
