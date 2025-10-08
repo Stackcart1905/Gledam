@@ -13,7 +13,8 @@ import TrendingSupplement from '@/pages/TrendingSupplement';
 import WellnessPage from '@/pages/Wellness';
 import MostLovedBestsellersPage from '@/pages/MostLovedBestsellers';
 import ApparelandAccessoriesPage from '@/pages/ApparelandAccessories';
-
+import Blogs from "./pages/Blogs";
+import TrackOrder from "./pages/TrackOrder";
 function App() {
   const [count, setCount] = useState(0)
 
@@ -28,6 +29,8 @@ function App() {
         <Route path="/wellness" element={<WellnessPage />} />
         <Route path="/most-loved-bestsellers" element={<MostLovedBestsellersPage />} />
         <Route path="/apparel-accessories" element={<ApparelandAccessoriesPage />} />
+         <Route path="/blogs" element={<Blogs />} />
+           <Route path="/track-order" element={<TrackOrder />} />
       </Routes>
       <WhatsappFloatingButton />
     </>
