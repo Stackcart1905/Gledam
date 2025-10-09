@@ -21,6 +21,8 @@ import Blogs from "./pages/Blogs";
 import TrackOrder from "./pages/TrackOrder";
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
+import GledamCash from './pages/GledamCash'; 
+import ReferAndEarn from './pages/ReferAndEarn';
 
 // Custom Hook for Scroll-to-Top functionality (Inline to avoid a new file)
 const useScrollToTop = () => {
@@ -63,6 +65,10 @@ function App() {
           <Route path="/track-order" element={<TrackOrder />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
+          <Route path="/gledam-cash" element={<GledamCash />} />
+          
+          <Route path="/refer-earn" element={<ReferAndEarn />} />
+          
         </Routes>
       </main>
       

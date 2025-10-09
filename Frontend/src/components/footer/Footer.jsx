@@ -43,6 +43,7 @@ const Footer = () => {
               {/* Policy Pages - Use consistent naming for the route */}
               <li><Link to="/privacy-policy" className={linkClass}>Privacy Policy</Link></li> 
               <li><Link to="/terms-conditions" className={linkClass}>Terms and Conditions</Link></li>
+             
             </ul>
           </div>
 
