@@ -21,7 +21,8 @@ const TrackOrder = () => {
         {/* Updated Logo/Text to "Beast" */}
         <div className="text-center mb-10">
           <h2 className="text-5xl font-extrabold uppercase tracking-wider">
-            <span style={{ color: neon }}>G</span>
+           <span style={{ color: "red" }}>G</span>
+
             <span>LEDEM</span>
             <span className="h-3 w-3 bg-red-500 rounded-full inline-block ml-2 align-top" />
           </h2>
