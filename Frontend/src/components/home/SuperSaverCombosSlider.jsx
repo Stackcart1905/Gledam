@@ -1,36 +1,10 @@
 import React, { useMemo, useRef } from 'react';
 import { useCart } from '@/lib/cart/CartContext';
-
-const resolveImageSrc = (url) => {
-  try {
-    const u = new URL(url);
-    const media = u.searchParams.get('mediaurl');
-    return media ? decodeURIComponent(media) : url;
-  } catch {
-    return url;
-  }
-};
-
-const rawImg = 'https://th.bing.com/th/id/OIP.UqWqe2NXjG21PPXZ7nq9BAHaHa?w=199&h=199&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3';
-const imgSrc = resolveImageSrc(rawImg);
+import { getProductsByCategory } from '@/lib/data/products';
 
 const SuperSaverCombosSlider = () => {
-  const discount = 15;
   const { addItem } = useCart();
-  const calcPrice = (mrp, pct) => Math.round(mrp * (1 - pct / 100));
-  const items = useMemo(
-    () => Array.from({ length: 7 }, (_, i) => ({
-      id: `combo-${i}`,
-      name: 'Protein  + Creatine',
-      rating: '4.7/5',
-      mrp: 5999,
-      price: calcPrice(5999, discount),
-      img: imgSrc,
-    })),
-    []
-  );
-
-  const pctOff = () => discount;
+  const items = useMemo(() => getProductsByCategory('Super Saver Combo'), []);
 
   const trackRef = useRef(null);
   // Auto slider removed; manual scroll only per requirement.
@@ -57,7 +31,7 @@ const SuperSaverCombosSlider = () => {
                   <div className="border border-gray-200 rounded-lg overflow-hidden">
                     <div className="bg-gray-100 flex items-center justify-center" style={{ width: '100%', height }}>
                       <img
-                        src={item.img}
+                        src={item.imageUrl}
                         alt={item.name}
                         style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
                         loading="lazy"
@@ -66,16 +40,20 @@ const SuperSaverCombosSlider = () => {
                     </div>
                     <div className="p-3">
                       <div className="text-sm font-semibold text-black line-clamp-1">{item.name}</div>
-                      <div className="text-xs text-gray-500 mt-1">Rating: {item.rating}</div>
+                      <div className="text-xs text-gray-500 mt-1">Rating: {item.rating || '4.7/5'}</div>
                       <div className="text-sm font-bold text-black mt-1 flex items-center gap-2">
-                        <span className="line-through text-gray-400">₹{item.mrp}</span>
+                        {item.mrp ? <span className="line-through text-gray-400">₹{item.mrp}</span> : null}
                         <span>₹{item.price}</span>
-                        <span className="text-green-600 text-xs font-semibold">{pctOff()}% OFF</span>
+                        {item.mrp && item.price && item.price < item.mrp ? (
+                          <span className="text-green-600 text-xs font-semibold">
+                            {Math.round((1 - item.price / item.mrp) * 100)}% OFF
+                          </span>
+                        ) : null}
                       </div>
                       <button
                         className="mt-2 w-full !text-black text-sm font-semibold py-2 rounded-md focus:outline-none hover:opacity-80 transition-opacity border-none"
                         style={{ backgroundColor: '#CCFF00', color: '#000000' }}
-                        onClick={() => addItem({ id: item.id, name: item.name, price: item.price, mrp: item.mrp, image: item.img })}
+                        onClick={() => addItem({ id: item.id, name: item.name, price: item.price, mrp: item.mrp, image: item.imageUrl })}
                       >
                         Add to cart
                       </button>

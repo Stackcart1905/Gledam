@@ -1,21 +1,26 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useCart } from '@/lib/cart/CartContext';
 import { useNavigate } from 'react-router-dom';
-
-const multivitaminLink = 'https://th.bing.com/th/id/OIP.VKOxY2W35pJm1-5ltV-K_gHaHa?w=177&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3';
+import { getProducts } from '@/lib/data/products';
 
 const Wellness = () => {
   const trackRef = useRef(null);
-  const { addItem } = useCart();
+  const { addItem, items: cartItems } = useCart();
+  const qtyOf = (id) => cartItems.find(i => i.id === id)?.qty || 0;
   const navigate = useNavigate();
 
-  const items = Array.from({ length: 9 }, (_, i) => ({
-    id: `wellness-${i}`,
-    name: `Multivitamin ${i + 1}`,
-    rating: '4.4/5',
-    price: 699,
-    img: multivitaminLink,
-  }));
+  const items = useMemo(() => {
+    const all = getProducts();
+    const wellnessCats = ['Multivitamins', 'Omega', 'Magnesium'];
+    const list = all.filter(p => wellnessCats.includes(p.category));
+    return list.slice(0, 9).map(p => ({
+      id: p.id,
+      name: p.name,
+      rating: '4.4/5',
+      price: p.price,
+      img: p.imageUrl,
+    }));
+  }, []);
 
   // Auto slider removed; use manual scroll.
   // Keep original card sizing; do not force 6-per-view
@@ -61,7 +66,7 @@ const Wellness = () => {
                         style={{ backgroundColor: '#CCFF00', color: '#000000' }}
                         onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.img })}
                       >
-                        Add to cart
+                        {qtyOf(item.id) > 0 ? `${qtyOf(item.id)} added` : 'Add to cart'}
                       </button>
                     </div>
                   </div>

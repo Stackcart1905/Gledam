@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 const StarCard = ({ title, subtitle, small = false, className = "" }) => {
   const pad = small ? "p-3" : "p-4";
@@ -15,6 +16,8 @@ const StarCard = ({ title, subtitle, small = false, className = "" }) => {
 };
 
 const LoginDialog = ({ open, onClose, brandName = "Gledam", tagLine = "Fuel Your Beast" }) => {
+  const { loginAs } = useAuth();
+  const [phone, setPhone] = useState("");
   // Close on Escape
   useEffect(() => {
     if (!open) return;
@@ -94,6 +97,8 @@ const LoginDialog = ({ open, onClose, brandName = "Gledam", tagLine = "Fuel Your
                     inputMode="numeric"
                     pattern="[0-9]*"
                     placeholder="Enter Mobile Number"
+                    value={phone}
+                    onChange={(e)=>setPhone(e.target.value)}
                     className="flex-1 outline-none border-none text-base bg-transparent placeholder:text-gray-400"
                   />
                 </div>
@@ -103,6 +108,14 @@ const LoginDialog = ({ open, onClose, brandName = "Gledam", tagLine = "Fuel Your
                   <input type="checkbox" defaultChecked className="mt-1" />
                   <span>Notify me for any updates & offers</span>
                 </label>
+
+                {/* Continue/Login button */}
+                <button
+                  className="mt-1 w-full bg-black text-white font-semibold py-2 rounded-lg border border-black hover:opacity-90"
+                  onClick={() => { loginAs('user', { phone }); onClose?.(); }}
+                >
+                  Continue
+                </button>
 
                 {/* Disclaimer */}
                 <div className="mt-27 text-[11px] text-gray-600 leading-relaxed">
