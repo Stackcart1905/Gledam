@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useMemo, useReducer } from "react";
+import { useAuth } from "@/lib/auth/AuthContext";
 
 const CartContext = createContext(null);
 
@@ -39,6 +40,14 @@ function cartReducer(state, action) {
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, initialState);
+  const auth = (() => {
+    try {
+      // Hook can't be used outside component body in SSR, but in client it's fine.
+      return useAuth();
+    } catch {
+      return { isLoggedIn: false };
+    }
+  })();
 
   const subtotal = useMemo(
     () => state.items.reduce((sum, i) => sum + (i.free ? 0 : (i.price || 0)) * (i.qty || 1), 0),
@@ -58,7 +67,13 @@ export function CartProvider({ children }) {
       subtotal,
       discount,
       total,
-      addItem: (item) => dispatch({ type: "ADD_ITEM", item }),
+      addItem: (item) => {
+        if (!auth?.isLoggedIn) {
+          if (typeof window !== 'undefined') window.alert('Please log in to add items to cart.');
+          return;
+        }
+        dispatch({ type: "ADD_ITEM", item })
+      },
       removeItem: (id) => dispatch({ type: "REMOVE_ITEM", id }),
       updateQty: (id, qty) => dispatch({ type: "UPDATE_QTY", id, qty }),
       clear: () => dispatch({ type: "CLEAR" }),

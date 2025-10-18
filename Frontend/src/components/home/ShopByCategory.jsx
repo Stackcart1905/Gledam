@@ -1,16 +1,19 @@
 import React from 'react';
 import { useCart } from '@/lib/cart/CartContext';
+import { useNavigate } from 'react-router-dom';
 import GledamLogo from '../common/GledamLogo';
 
+// Specific categories and routes required
 const categories = [
-  { key: 'strength', title: 'Strength', top: '#1c273dff', bottom: '#d6d9fbff' },
-  { key: 'endurance', title: 'Endurance', top: '#065F46', bottom: '#d2f8e6ff' },
-  { key: 'wellness', title: 'Wellness', top: '#7C2D12', bottom: '#f9e7d3ff' },
-  { key: 'recovery', title: 'Recovery', top: '#1F2937', bottom: '#E5E7EB' },
+  { key: 'prowhey', title: 'Pro Whey Protein', route: '/prowhey', top: '#1c273dff', bottom: '#d6d9fbff' },
+  { key: 'massgainer', title: 'Mass Gainer', route: '/massgainer', top: '#065F46', bottom: '#d2f8e6ff' },
+  { key: 'creatine', title: 'Creatine', route: '/creatine', top: '#7C2D12', bottom: '#f9e7d3ff' },
+  { key: 'peanutbutter', title: 'Peanut Butter', route: '/peanutbutter', top: '#1F2937', bottom: '#E5E7EB' },
 ];
 
 const ShopByCategory = () => {
   const { addItem } = useCart();
+  const navigate = useNavigate();
   return (
     <section className="w-full relative overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
       {/* Subtle background with outlined brand name on left and full-height logo on right */}
@@ -65,13 +68,13 @@ const ShopByCategory = () => {
 
               {/* Separate text and button below the image card */}
               <div className="mt-4 flex flex-col items-center">
-                <div className="text-base sm:text-2xl font-semibold  text-black">Pro Whey Protein</div>
+                <div className="text-base sm:text-2xl font-semibold  text-black">{cat.title}</div>
                 <button
-                  className="mt-4 w-full text-lg font-semibold py-2 rounded-md focus:outline-none hover:opacity-90 transition-opacity"
+                  className="mt-4 w-full text-lg py-2 rounded-md focus:outline-none hover:opacity-90 transition-opacity"
                   style={{ backgroundColor: '#CCFF00', color: '#000000' }}
-                  onClick={() => addItem({ id: `cat-${cat.key}`, name: `${cat.title} - Pro Whey Protein`, price: 999, mrp: 1299 })}
+                  onClick={() => navigate(cat.route)}
                 >
-                  Add to cart
+                  Shop Now
                 </button>
               </div>
             </div>

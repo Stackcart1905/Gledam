@@ -1,12 +1,35 @@
-# React + Vite
+# Gledam Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This app is a React + Vite storefront with an Admin dashboard, localStorage-backed data, and light auth. Key notes:
 
-Currently, two official plugins are available:
+## Admin Dashboard
+- Add/edit/delete products by category (Creatine, Protein Powder, Mass Gainer, Multivitamins, BCAA, etc.).
+- Super Saver Combos are created as normal products using category: "Super Saver Combo".
+- Image input: Upload only (file upload stored as base64). The image URL field has been removed as requested.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Auth & Login
+- A simple auth context stores login state in localStorage.
+- In the navbar, clicking the user icon opens a small menu with two options: User and Admin.
+	- User: logs in as a regular user.
+	- Admin: logs in as admin and navigates to /admin.
+- Add to cart is gated: users must be logged in to add items to the cart.
 
-## Expanding the ESLint configuration
+## Development
+- React 18/19 + Vite, React Router, Tailwind classes.
+- Aliases: `@` points to `src`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Quick Start
+- Install deps and run dev server.
+
+```pwsh
+cd Frontend
+npm install
+npm run dev
+```
+
+Open http://localhost:5173
+
+## Notes
+- Product data persists in the browser via localStorage.
+- If you need to reset products to initial seed, a utility exists in `src/lib/data/products.js` (resetToInitialProducts), but it's not exposed in the UI.
+

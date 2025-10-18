@@ -1,68 +1,13 @@
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { useCart } from '@/lib/cart/CartContext';
 import { useNavigate } from 'react-router-dom';
+import { getProducts } from '@/lib/data/products';
 
 const categories = [
   { key: 'bestseller', label: 'bestseller' },
   { key: 'creatine', label: 'creatine' },
   { key: 'protein', label: 'protein' },
 ];
-
-// Provided image links
-const providedProteinLink =
-  'https://www.bing.com/images/search?view=detailV2&ccid=2MRzMtHa&id=4BA3809F1ED480410C855757C265068F18F3B0BE&thid=OIP.2MRzMtHaA4DVmDzWH_1K8AHaHg&mediaurl=https%3a%2f%2fonemg.gumlet.io%2fl_watermark_346%2cw_690%2ch_700%2fa_ignore%2cw_690%2ch_700%2cc_pad%2cq_auto%2cf_auto%2fc4b851abdaa14773afe44eff17ca655f.jpg&exph=700&expw=690&q=beastlife+products&FORM=IRPRST&ck=393C57511AAAE8C9D444AEB968863C2E&selectedIndex=5&itb=1';
-const providedCreatineLink =
-  'https://th.bing.com/th/id/OIP.oUjph8lDeW4oT6jC-x19sQHaHa?w=218&h=217&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3';
-// Multivitamin demo image link
-const providedMultivitaminLink = 'https://th.bing.com/th/id/OIP.VKOxY2W35pJm1-5ltV-K_gHaHa?w=177&h=180&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3';
-
-// Resolve direct image URL when a Bing result URL contains a mediaurl param
-const resolveImageSrc = (url) => {
-  try {
-    const u = new URL(url);
-    const media = u.searchParams.get('mediaurl');
-    return media ? decodeURIComponent(media) : url;
-  } catch {
-    return url;
-  }
-};
-
-const proteinSrc = resolveImageSrc(providedProteinLink);
-const creatineSrc = resolveImageSrc(providedCreatineLink);
-const multivitaminSrc = providedMultivitaminLink ? resolveImageSrc(providedMultivitaminLink) : '';
-
-// Build demo items per category
-const buildProteinItems = (count = 6) =>
-  Array.from({ length: count }, (_, i) => ({
-    id: `protein-${i}`,
-    name: `Protein ${i + 1}`,
-    rating: '4.5/5',
-    price: 5499,
-    img: proteinSrc,
-    type: 'protein',
-  }));
-
-const buildCreatineItems = (count = 6) =>
-  Array.from({ length: count }, (_, i) => ({
-    id: `creatine-${i}`,
-    name: `Creatine ${i + 1}`,
-    rating: '4.6/5',
-    price: 499,
-    img: creatineSrc,
-    type: 'creatine',
-  }));
-
-const buildMultivitaminItems = (count = 4) =>
-  (multivitaminSrc
-    ? Array.from({ length: count }, (_, i) => ({
-        id: `multivitamin-${i}`,
-        name: `Multivitamin ${i + 1}`,
-        rating: '4.4/5',
-        price: 699,
-        img: multivitaminSrc,
-        type: 'multivitamin',
-      }))
-    : []);
 
 // Shuffle helper
 const shuffle = (arr) => {
@@ -78,19 +23,53 @@ const TalkOfTheTown = () => {
   const [active, setActive] = useState('bestseller');
   const trackRef = useRef(null);
   const { addItem } = useCart();
+  const { items: cartItems } = useCart();
+  const qtyOf = (id) => cartItems.find(i => i.id === id)?.qty || 0;
   const navigate = useNavigate();
 
-  const proteinItems = buildProteinItems(6);
-  const creatineItems = buildCreatineItems(6);
-  const multivitaminItems = buildMultivitaminItems(6); // will be [] if not provided
+  const all = useMemo(() => getProducts(), []);
+  const proteinItems = useMemo(
+    () => all.filter(p => p.category === 'Protein Powder').slice(0, 6).map(p => ({
+      id: p.id,
+      name: p.name,
+      rating: '4.5/5',
+      price: p.price,
+      img: p.imageUrl,
+      type: 'protein',
+    })),
+    [all]
+  );
+  const creatineItems = useMemo(
+    () => all.filter(p => p.category === 'Creatine').slice(0, 6).map(p => ({
+      id: p.id,
+      name: p.name,
+      rating: '4.6/5',
+      price: p.price,
+      img: p.imageUrl,
+      type: 'creatine',
+    })),
+    [all]
+  );
+  const multivitaminItems = useMemo(
+    () => all.filter(p => p.category === 'Multivitamins').slice(0, 6).map(p => ({
+      id: p.id,
+      name: p.name,
+      rating: '4.4/5',
+      price: p.price,
+      img: p.imageUrl,
+      type: 'multivitamin',
+    })),
+    [all]
+  );
 
   // Build bestseller: 3 of each category (protein, creatine, multivitamin), shuffled. If multivitamin missing, fill to 9 with protein/creatine.
   const bestsellerMixed = () => {
-    const bestProtein = buildProteinItems(3).map((item, i) => ({ ...item, id: `best-${item.id}-${i}` }));
-    const bestCreatine = buildCreatineItems(3).map((item, i) => ({ ...item, id: `best-${item.id}-${i}` }));
-    const bestMulti = buildMultivitaminItems(3).map((item, i) => ({ ...item, id: `best-${item.id}-${i}` }));
+    const take = (arr, n) => arr.slice(0, n);
+    const bestProtein = take(proteinItems, 3);
+    const bestCreatine = take(creatineItems, 3);
+    const bestMulti = take(multivitaminItems, 3);
     let mixed = [...bestProtein, ...bestCreatine, ...bestMulti];
-    const fillers = [...bestProtein, ...bestCreatine];
+    const fillers = [...proteinItems, ...creatineItems];
     let k = 0;
     while (mixed.length < 9 && fillers.length > 0) {
       const base = fillers[k % fillers.length];
@@ -183,11 +162,9 @@ const TalkOfTheTown = () => {
                       <button
                         className="mt-2 w-full !text-black text-sm font-semibold py-2 rounded-md focus:outline-none hover:opacity-80 transition-opacity border-none"
                         style={{ backgroundColor: '#CCFF00', color: '#000000' }}
-                        onClick={() =>
-                          addItem({ id: item.id, name: item.name, price: item.price, image: item.img })
-                        }
+                        onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.img })}
                       >
-                        Add to cart
+                        {qtyOf(item.id) > 0 ? `${qtyOf(item.id)} added` : 'Add to cart'}
                       </button>
                     </div>
                   </div>

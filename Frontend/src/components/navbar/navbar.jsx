@@ -1,9 +1,12 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaWhatsapp, FaQrcode, FaUser, FaShoppingCart, FaSearch } from 'react-icons/fa';
 import LoginDialog from "@/components/common/LoginDialog";
 import CartDrawer from "@/components/common/CartDrawer";
 import { useCart } from "@/lib/cart/CartContext";
+import { useAuth } from "@/lib/auth/AuthContext";
+
+const WHATSAPP_URL = 'https://wa.me/919999999999'; // TODO: replace with your official number
 
 // Data for the Product Dropdown
 const productCategories = [
@@ -125,18 +128,58 @@ const Navbar = () => {
   const [loginOpen, setLoginOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
+  const [loginMenuOpen, setLoginMenuOpen] = useState(false);
+  const loginMenuRef = useRef(null);
+  const firstMenuItemRef = useRef(null);
+  const [menuReady, setMenuReady] = useState(false);
 
   const { items } = useCart();
   const navigate = useNavigate();
   const cartCount = useMemo(() => items.reduce((n, i) => n + (i.qty || 1), 0), [items]);
+  const { isLoggedIn, role, loginAs, logout } = useAuth();
 
-  const navigationItems = [
-    // 'Product' is handled separately below for the hover effect
-    { label: 'Our Story', path: '/about' },
-    { label: 'Authenticity Guaranteed', path: '/authenticator' },
-    { label: 'Blogs', path: '/blogs' },
-    { label: 'Track My Order', path: '/track-order'}
-  ];
+  // Close login menu on outside click or ESC
+  useEffect(() => {
+    function onDocMouseDown(e) {
+      if (!loginMenuOpen) return;
+      if (loginMenuRef.current && !loginMenuRef.current.contains(e.target)) {
+        setLoginMenuOpen(false);
+      }
+    }
+    function onKeyDown(e) {
+      if (e.key === 'Escape') setLoginMenuOpen(false);
+    }
+    document.addEventListener('mousedown', onDocMouseDown);
+    document.addEventListener('keydown', onKeyDown);
+    return () => {
+      document.removeEventListener('mousedown', onDocMouseDown);
+      document.removeEventListener('keydown', onKeyDown);
+    };
+  }, [loginMenuOpen]);
+
+  // Animate dropdown on mount and focus first item
+  useEffect(() => {
+    if (loginMenuOpen) {
+      setMenuReady(false);
+      const id = requestAnimationFrame(() => {
+        setMenuReady(true);
+        // Focus first menu item for accessibility
+        firstMenuItemRef.current?.focus?.();
+      });
+      return () => cancelAnimationFrame(id);
+    }
+  }, [loginMenuOpen]);
+
+  const navigationItems = useMemo(() => {
+    const base = [
+      { label: 'Our Story', path: '/about' },
+      { label: 'Authenticity Guaranteed', path: '/authenticator' },
+      { label: 'Blogs', path: '/blogs' },
+      { label: 'Track My Order', path: '/track-order' },
+    ];
+    if (isLoggedIn && role === 'admin') base.push({ label: 'Admin', path: '/admin' });
+    return base;
+  }, [isLoggedIn, role]);
 
   return (
     <nav className="bg-black text-white w-full">
@@ -183,14 +226,87 @@ const Navbar = () => {
 
           {/* Right - Icons - UNCHANGED */}
           <div className="flex items-center space-x-2 sm:space-x-4 min-w-[120px] sm:min-w-[200px] justify-start">
-            <span className="hidden sm:block">
+            <a href={WHATSAPP_URL} target="_blank" rel="noopener noreferrer" className="hidden sm:block" aria-label="WhatsApp">
               <FaWhatsapp className="h-6 w-6 sm:h-7 sm:w-7 text-white" />
-            </span>
+            </a>
             <span onClick={() => navigate('/authenticator')} className="cursor-pointer">
               <FaQrcode className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
             </span>
-            <span onClick={() => setLoginOpen(true)} className="cursor-pointer">
-              <FaUser className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+            <span className="relative flex items-center gap-1" ref={loginMenuRef}>
+              <span
+                onClick={() => setLoginMenuOpen(v => !v)}
+                className="cursor-pointer"
+                role="button"
+                tabIndex={0}
+                aria-haspopup="menu"
+                aria-expanded={loginMenuOpen}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); setLoginMenuOpen(v => !v); } }}
+              >
+                <FaUser className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
+              </span>
+              {/* Keep the icon visually same as other icons (no adjacent role badge) */}
+              {loginMenuOpen && (
+                <div
+                  role="menu"
+                  aria-label="Profile menu"
+                  onKeyDown={(e) => {
+                    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+                      const items = Array.from(loginMenuRef.current?.querySelectorAll('[data-menuitem="true"]') || []);
+                      const current = document.activeElement;
+                      const idx = items.indexOf(current);
+                      let nextIdx = 0;
+                      if (e.key === 'ArrowDown') nextIdx = idx < items.length - 1 ? idx + 1 : 0;
+                      if (e.key === 'ArrowUp') nextIdx = idx > 0 ? idx - 1 : items.length - 1;
+                      items[nextIdx]?.focus?.();
+                      e.preventDefault();
+                    }
+                  }}
+                  className={`absolute top-full right-0 mt-2 min-w-[9rem] bg-white text-black rounded-lg border border-gray-200 shadow-xl z-50 py-1 transition transform origin-top-right ease-out duration-150 ${menuReady ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+                  style={{ willChange: 'transform, opacity' }}
+                >
+                  {/* Caret */}
+                  <span className="absolute -top-2 right-3 inline-block w-0 h-0 border-l-6 border-l-transparent border-r-6 border-r-transparent border-b-6 border-b-white" />
+                  {!isLoggedIn ? (
+                    <>
+                      <button
+                        ref={firstMenuItemRef}
+                        data-menuitem="true"
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        onClick={() => { setLoginOpen(true); setLoginMenuOpen(false); }}
+                      >
+                        User Login
+                      </button>
+                      <button
+                        data-menuitem="true"
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        onClick={() => { setLoginMenuOpen(false); navigate('/admin-login'); }}
+                      >
+                        Admin Login
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <div className="px-4 py-2 text-xs text-gray-600">Logged in as {role}</div>
+                      {role === 'admin' && (
+                        <button
+                          data-menuitem="true"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                          onClick={() => { navigate('/admin'); setLoginMenuOpen(false); }}
+                        >
+                          Go to Admin
+                        </button>
+                      )}
+                      <button
+                        data-menuitem="true"
+                        className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                        onClick={() => { logout(); setLoginMenuOpen(false); }}
+                      >
+                        Logout
+                      </button>
+                    </>
+                  )}
+                </div>
+              )}
             </span>
             <span className="relative cursor-pointer" onClick={() => setCartOpen(true)}>
               <FaShoppingCart className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
@@ -255,7 +371,7 @@ const Navbar = () => {
       </div>
       
       {/* Dialogs/Drawers - UNCHANGED */}
-      <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
+  <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </nav>
   );

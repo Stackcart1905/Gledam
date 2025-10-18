@@ -23,6 +23,9 @@ import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
 import GledamCash from './pages/GledamCash'; 
 import ReferAndEarn from './pages/ReferAndEarn';
+import AdminDashboard from './pages/AdminDashboard';
+import AdminLogin from './pages/AdminLogin';
+import CategoryProducts from './pages/CategoryProducts';
 
 // Custom Hook for Scroll-to-Top functionality (Inline to avoid a new file)
 const useScrollToTop = () => {
@@ -68,6 +71,16 @@ function App() {
           <Route path="/gledam-cash" element={<GledamCash />} />
           
           <Route path="/refer-earn" element={<ReferAndEarn />} />
+          <Route path="/admin" element={<AdminDashboard />} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+
+          {/* Category product listings */}
+          <Route path="/creatine" element={<CategoryProducts category="Creatine" />} />
+          <Route path="/prowhey" element={<CategoryProducts category="Protein Powder" />} />
+          <Route path="/massgainer" element={<CategoryProducts category="Mass Gainer" />} />
+          <Route path="/multivitamins" element={<CategoryProducts category="Multivitamins" />} />
+          <Route path="/bcaa" element={<CategoryProducts category="BCAA" />} />
+          <Route path="/peanutbutter" element={<CategoryProducts category="Peanut Butter" />} />
           
         </Routes>
       </main>

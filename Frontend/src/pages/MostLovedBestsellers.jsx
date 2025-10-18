@@ -1,20 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useCart } from '@/lib/cart/CartContext';
 import Footer from '@/components/footer/Footer';
-
-
-// Simple demo data (can be replaced with real products later)
-const demoProducts = Array.from({ length: 24 }, (_, i) => ({
-    id: i + 1,
-    name: `Product ${i + 1}`,
-    price: 199 + (i % 9) * 50,
-    inStock: i % 4 !== 0, // 75% in stock
-    image:
-        'https://www.bing.com/images/search?view=detailV2&ccid=2MRzMtHa&id=4BA3809F1ED480410C855757C265068F18F3B0BE&thid=OIP.2MRzMtHaA4DVmDzWH_1K8AHaHg&mediaurl=https%3a%2f%2fonemg.gumlet.io%2fl_watermark_346%2cw_690%2ch_700%2fa_ignore%2cw_690%2ch_700%2cc_pad%2cq_auto%2cf_auto%2fc4b851abdaa14773afe44eff17ca655f.jpg&exph=700&expw=690&q=beastlife+products&FORM=IRPRST&ck=393C57511AAAE8C9D444AEB968863C2E&selectedIndex=5&itb=1',
-    rating: 3.5 + ((i % 5) * 0.3), // ~3.5 to ~4.7
-    createdAt: Date.now() - i * 24 * 60 * 60 * 1000, // newer items have smaller i
-    sizes: ['250g', '500g', '1kg'],
-}));
+import { getProducts } from '@/lib/data/products';
 
 const MostLovedBestsellers = () => {
     // Filters
@@ -35,7 +22,16 @@ const MostLovedBestsellers = () => {
     const pageSize = 12; // 4 per row x 3 rows
 
     const filtered = useMemo(() => {
-        let list = [...demoProducts];
+        // bestseller = all products for now; user can filter
+        let list = getProducts().map(p => ({
+            id: p.id,
+            name: p.name,
+            price: p.price,
+            inStock: (p.stock ?? 0) > 0,
+            image: p.imageUrl,
+            rating: 4.2, // placeholder rating until real ratings exist
+            createdAt: Date.now(),
+        }));
         // Price filter
         const from = Number(priceFrom);
         const to = Number(priceTo);

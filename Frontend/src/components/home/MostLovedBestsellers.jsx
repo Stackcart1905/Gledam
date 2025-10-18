@@ -1,37 +1,32 @@
-import React, { useRef } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useCart } from '@/lib/cart/CartContext';
 import { useNavigate } from 'react-router-dom';
-
-const proteinLink =
-  'https://www.bing.com/images/search?view=detailV2&ccid=2MRzMtHa&id=4BA3809F1ED480410C855757C265068F18F3B0BE&thid=OIP.2MRzMtHaA4DVmDzWH_1K8AHaHg&mediaurl=https%3a%2f%2fonemg.gumlet.io%2fl_watermark_346%2cw_690%2ch_700%2fa_ignore%2cw_690%2ch_700%2cc_pad%2cq_auto%2cf_auto%2fc4b851abdaa14773afe44eff17ca655f.jpg&exph=700&expw=690&q=beastlife+products&FORM=IRPRST&ck=393C57511AAAE8C9D444AEB968863C2E&selectedIndex=5&itb=1';
-const creatineLink =
-  'https://th.bing.com/th/id/OIP.oUjph8lDeW4oT6jC-x19sQHaHa?w=218&h=217&c=7&r=0&o=7&dpr=1.3&pid=1.7&rm=3';
-
-const resolveImageSrc = (url) => {
-  try {
-    const u = new URL(url);
-    const media = u.searchParams.get('mediaurl');
-    return media ? decodeURIComponent(media) : url;
-  } catch {
-    return url;
-  }
-};
-
-const proteinSrc = resolveImageSrc(proteinLink);
-const creatineSrc = resolveImageSrc(creatineLink);
+import { getProducts } from '@/lib/data/products';
 
 const MostLovedBestsellers = () => {
   const trackRef = useRef(null);
-  const { addItem } = useCart();
+  const { addItem, items: cartItems } = useCart();
+  const qtyOf = (id) => cartItems.find(i => i.id === id)?.qty || 0;
   const navigate = useNavigate();
 
-  const items = Array.from({ length: 9 }, (_, i) => ({
-    id: `ml-${i}`,
-    name: (i % 2 === 0 ? 'Protein ' : 'Creatine ') + (i + 1),
-    rating: '4.7/5',
-    price: i % 2 === 0 ? 5499 : 499,
-    img: i % 2 === 0 ? proteinSrc : creatineSrc,
-  }));
+  const items = useMemo(() => {
+    const all = getProducts();
+    const proteins = all.filter(p => p.category === 'Protein Powder');
+    const creatines = all.filter(p => p.category === 'Creatine');
+    const merged = [];
+    const max = Math.max(proteins.length, creatines.length);
+    for (let i = 0; i < max; i++) {
+      if (i < proteins.length) merged.push(proteins[i]);
+      if (i < creatines.length) merged.push(creatines[i]);
+    }
+    return merged.slice(0, 9).map((p, idx) => ({
+      id: p.id || `ml-${idx}`,
+      name: p.name,
+      rating: '4.7/5',
+      price: p.price,
+      img: p.imageUrl,
+    }));
+  }, []);
 
   // Keep original card sizing
 
@@ -76,11 +71,9 @@ const MostLovedBestsellers = () => {
                       <button
                         className="mt-2 w-full !text-black text-sm font-semibold py-2 rounded-md focus:outline-none hover:opacity-80 transition-opacity border-none"
                         style={{ backgroundColor: '#CCFF00', color: '#000000' }}
-                        onClick={() =>
-                          addItem({ id: item.id, name: item.name, price: item.price, image: item.img })
-                        }
+                        onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.img })}
                       >
-                        Add to cart
+                        {qtyOf(item.id) > 0 ? `${qtyOf(item.id)} added` : 'Add to cart'}
                       </button>
                     </div>
                   </div>
