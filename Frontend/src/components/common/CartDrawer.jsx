@@ -1,8 +1,10 @@
-import React, { useEffect, useMemo } from "react";
-import { useCart } from "@/lib/cart/CartContext";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useCart } from "@/context/useCart";
 
 const CartDrawer = ({ open, onClose }) => {
-  const { items, subtotal, discount, total, removeItem, updateQty, applyCoupon } = useCart();
+  const navigate = useNavigate();
+  const { items, coupon, subtotal, discount, total, removeItem, updateQty, applyCoupon } = useCart();
   // Close on Escape
   useEffect(() => {
     if (!open) return;
@@ -14,6 +16,13 @@ const CartDrawer = ({ open, onClose }) => {
   const THRESHOLD = 899;
   const progressPercent = Math.min(100, Math.round((total / THRESHOLD) * 100));
   const reached = total >= THRESHOLD;
+
+  const handleCheckout = async () => {
+    // This function should be implemented to handle the checkout process
+    // For now, we'll just close the cart and navigate to the checkout page
+    onClose();
+    navigate('/checkout');
+  };
 
   return (
   <div className={`fixed inset-0 z-50 ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
@@ -131,13 +140,26 @@ const CartDrawer = ({ open, onClose }) => {
               if (el?.value) applyCoupon(el.value);
             }}>Apply</button>
           </div>
+          {coupon && (
+            <div className="bg-green-50 border border-green-200 rounded-lg p-3 text-sm">
+              <div className="flex justify-between">
+                <span>Coupon Applied:</span>
+                <span className="font-bold">{coupon}</span>
+              </div>
+            </div>
+          )}
           <div className="bg-white rounded-xl border p-3 text-sm">
             <div className="flex justify-between py-1"><span>Subtotal</span><span>₹ {subtotal.toLocaleString()}</span></div>
             <div className="flex justify-between py-1"><span>Discount</span><span className="text-green-600">- ₹ {discount.toLocaleString()}</span></div>
             <div className="flex justify-between py-2 text-lg font-bold"><span>Total</span><span>₹ {total.toLocaleString()}</span></div>
           </div>
           <div className="text-sm text-gray-700 px-1">Earn <b>28</b></div>
-          <button className="w-full bg-black text-white rounded-lg py-4 text-lg font-bold">Checkout</button>
+          <button 
+            className="w-full bg-black text-white rounded-lg py-4 text-lg font-bold"
+            onClick={handleCheckout}
+          >
+            Checkout
+          </button>
           <div className="h-3" />
         </div>
       </aside>

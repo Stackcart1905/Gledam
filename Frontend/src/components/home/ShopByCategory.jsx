@@ -1,5 +1,4 @@
 import React from 'react';
-import { useCart } from '@/lib/cart/CartContext';
 import { useNavigate } from 'react-router-dom';
 import GledamLogo from '../common/GledamLogo';
 
@@ -12,7 +11,7 @@ const categories = [
 ];
 
 const ShopByCategory = () => {
-  const { addItem } = useCart();
+
   const navigate = useNavigate();
   return (
     <section className="w-full relative overflow-hidden" style={{ backgroundColor: '#ffffff' }}>

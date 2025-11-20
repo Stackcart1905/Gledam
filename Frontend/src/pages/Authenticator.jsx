@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Footer from '@/components/footer/Footer';
 
 const neon = '#CCFF00';
 
 const Authenticator = () => {
+  const navigate = useNavigate();
   const [code, setCode] = useState('');
   const [phone, setPhone] = useState('');
 
@@ -16,7 +18,7 @@ const Authenticator = () => {
   return (
     <main className="w-full bg-black text-white">
       {/* Container below navbar */}
-      <div className="max-w-7xl mx-auto px-6 py-12">
+      <div className="max-w-7xl mx-auto px-6 py-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left: Heading + form */}
           <div>
@@ -56,10 +58,30 @@ const Authenticator = () => {
                 Check Authenticity
               </button>
             </form>
+            <div className="mt-6 flex flex-col sm:flex-row gap-3 justify-center">
+              <button 
+                onClick={() => navigate('/login')}
+                className="px-4 py-2 bg-gray-800 text-white rounded-lg hover:bg-gray-700 transition-colors"
+              >
+                User Login
+              </button>
+              <button 
+                onClick={() => navigate('/signup')}
+                className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-500 transition-colors"
+              >
+                Sign Up
+              </button>
+              <button 
+                onClick={() => navigate('/admin-login')}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-500 transition-colors"
+              >
+                Admin Login
+              </button>
+            </div>
           </div>
 
           {/* Right: 'Gledam' brand in navbar style instead of human image */}
-          <div className="flex justify-center lg:justify-end">
+          <div className="flex justify-center lg:justify-end mr-0 lg:mr-26">
             <div className="text-right">
               <h2 className="text-7xl font-extrabold uppercase tracking-wider">
                 <span className="text-red-500">G</span>
@@ -73,31 +95,7 @@ const Authenticator = () => {
       </div>
 
       {/* White background section below authenticator content */}
-      <section className="w-full bg-white mt-12">
-        <div className="max-w-7xl mx-auto px-6 py-6">
-          {/* Divider line (light on white bg) */}
-          <hr className="mt-8 border-t border-black w-full" />
-
-          {/* Back to top button (match home-style: centered, rounded, dark) */}
-          <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="inline-flex items-center gap-2 font-semibold text-black hover:underline"
-            aria-label="Back to top"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <path d="M12 19V5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
-              <path d="M6 11l6-6 6 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            Back to Top
-          </button>
-        </div>
-        </div>
-      </section>
-
-      {/* Footer like home */}
-      <Footer />
+     
     </main>
   );
 };

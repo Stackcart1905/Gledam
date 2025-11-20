@@ -52,11 +52,11 @@ const Footer = () => {
             <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4">Product</h3>
             <ul className="space-y-1 sm:space-y-2 text-sm sm:text-base">
               {/* Product Category Links */}
-              <li><Link to="/products/protein" className={linkClass}>Protein</Link></li>
-              <li><Link to="/products/gainer" className={linkClass}>Gainer</Link></li>
-              <li><Link to="/products/creatine" className={linkClass}>Creatine</Link></li>
-              <li><Link to="/products/peanut-butter" className={linkClass}>Peanut butter</Link></li>
-              <li><Link to="/products/multivitamins" className={linkClass}>Multivitamins</Link></li>
+              <li><Link to="/protein" className={linkClass}>Protein</Link></li>
+              <li><Link to="/massgainer" className={linkClass}>Gainer</Link></li>
+              <li><Link to="/creatine" className={linkClass}>Creatine</Link></li>
+              <li><Link to="/peanutbutter" className={linkClass}>Peanut butter</Link></li>
+              <li><Link to="/multivitamins" className={linkClass}>Multivitamins</Link></li>
             </ul>
           </div>
 

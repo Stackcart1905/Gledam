@@ -1,5 +1,5 @@
-import React, { useMemo, useRef } from 'react';
-import { useCart } from '@/lib/cart/CartContext';
+import React, { useRef, useEffect, useState } from 'react';
+import { useCart } from '@/context/useCart';
 import { useNavigate } from 'react-router-dom';
 import { getProducts } from '@/lib/data/products';
 
@@ -8,24 +8,38 @@ const MostLovedBestsellers = () => {
   const { addItem, items: cartItems } = useCart();
   const qtyOf = (id) => cartItems.find(i => i.id === id)?.qty || 0;
   const navigate = useNavigate();
+  const [items, setItems] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  const items = useMemo(() => {
-    const all = getProducts();
-    const proteins = all.filter(p => p.category === 'Protein Powder');
-    const creatines = all.filter(p => p.category === 'Creatine');
-    const merged = [];
-    const max = Math.max(proteins.length, creatines.length);
-    for (let i = 0; i < max; i++) {
-      if (i < proteins.length) merged.push(proteins[i]);
-      if (i < creatines.length) merged.push(creatines[i]);
-    }
-    return merged.slice(0, 9).map((p, idx) => ({
-      id: p.id || `ml-${idx}`,
-      name: p.name,
-      rating: '4.7/5',
-      price: p.price,
-      img: p.imageUrl,
-    }));
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const all = await getProducts();
+        const proteins = all.filter(p => p.category === 'Protein Powder');
+        const creatines = all.filter(p => p.category === 'Creatine');
+        const merged = [];
+        const max = Math.max(proteins.length, creatines.length);
+        for (let i = 0; i < max; i++) {
+          if (i < proteins.length) merged.push(proteins[i]);
+          if (i < creatines.length) merged.push(creatines[i]);
+        }
+        const mappedItems = merged.slice(0, 9).map((p, idx) => ({
+          id: p.id || `ml-${idx}`,
+          name: p.name,
+          rating: '4.7/5',
+          price: p.price,
+          img: p.imageUrl,
+        }));
+        setItems(mappedItems);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   // Keep original card sizing
@@ -42,45 +56,51 @@ const MostLovedBestsellers = () => {
         </div>
 
         <div className="relative">
-          <div
-            ref={trackRef}
-            className="flex gap-3 sm:gap-4 lg:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2"
-            style={{ scrollBehavior: 'smooth' }}
-          >
-            {items.map((item, idx) => {
-              const baseWidth = 140; // px
-              const step = 20; // px increase per card
-              const width = baseWidth + idx * step;
-              const height = 400; // fixed equal height
-              return (
-                <div key={item.id} className="snap-start" style={{ minWidth: width + 160 }}>
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="bg-gray-100 flex items-center justify-center" style={{ width: '100%', height }}>
-                      <img
-                        src={item.img}
-                        alt={item.name}
-                        style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
-                        loading="lazy"
-                        referrerPolicy="no-referrer"
-                      />
-                    </div>
-                    <div className="p-3">
-                      <div className="text-sm font-semibold text-black line-clamp-1">{item.name}</div>
-                      <div className="text-xs text-gray-500 mt-1">Rating: {item.rating}</div>
-                      <div className="text-sm font-bold text-black mt-1">₹{item.price}</div>
-                      <button
-                        className="mt-2 w-full !text-black text-sm font-semibold py-2 rounded-md focus:outline-none hover:opacity-80 transition-opacity border-none"
-                        style={{ backgroundColor: '#CCFF00', color: '#000000' }}
-                        onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.img })}
-                      >
-                        {qtyOf(item.id) > 0 ? `${qtyOf(item.id)} added` : 'Add to cart'}
-                      </button>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            </div>
+          ) : (
+            <div
+              ref={trackRef}
+              className="flex gap-3 sm:gap-4 lg:gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory pb-2"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {items.map((item, idx) => {
+                const baseWidth = 140; // px
+                const step = 20; // px increase per card
+                const width = baseWidth + idx * step;
+                const height = 400; // fixed equal height
+                return (
+                  <div key={item.id} className="snap-start" style={{ minWidth: width + 160 }}>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <div className="bg-gray-100 flex items-center justify-center" style={{ width: '100%', height }}>
+                        <img
+                          src={item.img}
+                          alt={item.name}
+                          style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                        />
+                      </div>
+                      <div className="p-3">
+                        <div className="text-sm font-semibold text-black line-clamp-1">{item.name}</div>
+                        <div className="text-xs text-gray-500 mt-1">Rating: {item.rating}</div>
+                        <div className="text-sm font-bold text-black mt-1">₹{item.price}</div>
+                        <button
+                          className="mt-2 w-full !text-black text-sm font-semibold py-2 rounded-md focus:outline-none hover:opacity-80 transition-opacity border-none"
+                          style={{ backgroundColor: '#CCFF00', color: '#000000' }}
+                          onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.img })}
+                        >
+                          {qtyOf(item.id) > 0 ? `${qtyOf(item.id)} added` : 'Add to cart'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         <div className="mt-8 flex justify-center">

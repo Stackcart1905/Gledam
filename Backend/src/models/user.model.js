@@ -13,10 +13,18 @@ const userSchema = mongoose.Schema({
      unique : true  , 
      trim : true , 
    } , 
+   // For legacy auth this may exist; for Clerk users this can be omitted
    password : {
     type : String , 
-    required : true , 
+    required : false , 
    } , 
+   // Clerk user id linkage
+   clerkUserId: {
+     type: String,
+     index: true,
+     unique: true,
+     sparse: true,
+   },
    isVerified: 
     { 
     type: Boolean,
@@ -26,7 +34,7 @@ const userSchema = mongoose.Schema({
    role : {
     type : String  , 
     required : true , 
-    enum: ["user", "admin"],
+    enum: ["user", "admin", "owner"],
     default : "user" , 
    } , 
 } , {timestamps : true})  ; 

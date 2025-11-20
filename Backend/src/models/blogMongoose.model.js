@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose' ; 
 
 const blogSchema = new mongoose.Schema({
@@ -9,12 +8,12 @@ const blogSchema = new mongoose.Schema({
   },
   coverImage : {
     type : String , 
-    required : true  , 
+    required : false,  // Making this optional
   } ,
   // store public id from cloudinary of image it will help to delete image from cloudinary 
   publicId : {
     type : String , 
-    required : true , 
+    required : false,  // Making this optional
   }  , 
   content: {
     type: String,

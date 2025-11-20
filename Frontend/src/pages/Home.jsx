@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import ChatbotFloatingLogo from '@/components/common/ChatbotFloatingLogo';
-import ChatbotPanel from '@/components/common/ChatbotPanel';
+import React from 'react';
 import HeroSection from '@/components/home/HeroSection';
 import TalkOfTheTown from '@/components/home/TalkOfTheTown';
 import Wellness from '@/components/home/Wellness';
@@ -15,10 +13,9 @@ import ShopByCategory from '@/components/home/ShopByCategory';
 import Testimonials from '@/components/home/Testimonials';
 import BrandMarqueeStrip from '@/components/home/BrandMarqueeStrip';
 import Gledamgram from '@/components/home/Gledamgram';
-import Footer from '@/components/footer/Footer';
 
 const Home = () => {
-  const [chatOpen, setChatOpen] = useState(false);
+  // const [chatOpen, setChatOpen] = useState(false);
   return (
   <>
       <HeroSection />
@@ -35,9 +32,9 @@ const Home = () => {
       <Testimonials />
       <BrandMarqueeStrip />
       <Gledamgram />
-  <Footer />
-  <ChatbotFloatingLogo onClick={() => setChatOpen(true)} />
-  <ChatbotPanel open={chatOpen} onClose={() => setChatOpen(false)} />
+  
+  {/* <ChatbotFloatingLogo onClick={() => setChatOpen(true)} /> */}
+  {/* <ChatbotPanel open={chatOpen} onClose={() => setChatOpen(false)} /> */}
     </>
   );
 };

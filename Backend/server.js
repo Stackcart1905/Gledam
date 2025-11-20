@@ -1,1 +1,2 @@
-// This will be the entry point for your backend server
+// Entry point for the backend server
+import './src/index.js';
