@@ -3,7 +3,7 @@ import {cloudinaryUpload , deleteFromCloudinary} from "../lib/cloudinary.js";
 
 // get blog
 
-// need to update when there will be more blog fields becauuse we need to send blog according to scroll
+// need to update when there will be more blog fields because we need to send blog according to scroll
 const getAllBlog = async (req, res) => {
   try {
     const posts = await Blog.find();
@@ -13,7 +13,7 @@ const getAllBlog = async (req, res) => {
   }
 }
 
-// get blogby id 
+//! get blog by id 
 const getBlogById = async (req, res) => {
   try {
     const post = await Blog.findById(req.params.id);
@@ -27,8 +27,7 @@ const getBlogById = async (req, res) => {
 }
 
 
-// create blog 
-
+//! create blog 
 const createBlogPost = async (req, res) => {
   try {
     // Destructure fields from req.body and check for other required fields
@@ -37,30 +36,35 @@ const createBlogPost = async (req, res) => {
       return res.status(400).json({ success: false, error: 'Title, content, and author are required.' });
     }
 
-    // Handle the image upload. The image file is in req.file, not req.body.
-    if (!req.file) {
-      return res.status(400).json({ success: false, error: 'A cover image is required.' });
-    }
-
-    //  Upload the image to Cloudinary
-    const uploadedImage = await cloudinaryUpload(req.file); // Assuming memoryStorage()
-    // If you used diskStorage(), the argument would be req.file.path
-
-    if (!uploadedImage || !uploadedImage.secure_url || !uploadedImage.public_id) {
-      return res.status(500).json({ success: false, error: 'Image upload failed.' });
-    }
-
-    // Create the new blog post document
-    const newPost = new Blog({
+    // Initialize blog post data
+    const blogData = {
       title,
-      coverImage: uploadedImage.secure_url,
-      publicId: uploadedImage.public_id,
       content,
       author,
       tags: tags ? tags.split(',') : [], // Safely handle tags
-    });
+    };
 
-    // Save the document to the database
+    //! Handle the image upload if a file was provided
+    //! Commenting out image upload for now as it's not being used
+    /*
+    if (req.file) {
+      // Upload the image to Cloudinary
+      const uploadedImage = await cloudinaryUpload(req.file); // Assuming memoryStorage()
+      
+      if (!uploadedImage || !uploadedImage.secure_url || !uploadedImage.public_id) {
+        return res.status(500).json({ success: false, error: 'Image upload failed.' });
+      }
+      
+      // Add image data to blog post
+      blogData.coverImage = uploadedImage.secure_url;
+      blogData.publicId = uploadedImage.public_id;
+    }
+    */
+
+    //! Create the new blog post document
+    const newPost = new Blog(blogData);
+
+    //! Save the document to the database
     await newPost.save();
 
     res.status(201).json({ success: true, data: newPost });
@@ -70,22 +74,23 @@ const createBlogPost = async (req, res) => {
   }
 };
 
-//  update blog
-
+//! update blog
 const updateBlogPost = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Find the existing blog post to get its current image publicId
+    //! Find the existing blog post to get its current image publicId
     const existingPost = await Blog.findById(id);
     if (!existingPost) {
       return res.status(404).json({ success: false, error: 'Blog post not found' });
     }
 
-    // Initialize an empty object for the fields to be updated
+    //! Initialize an empty object for the fields to be updated
     const updateFields = { ...req.body };
 
-    // Check if a new file was uploaded
+    //! Check if a new file was uploaded
+    //! Commenting out image update for now as it's not being used
+    /*
     if (req.file) {
       //  Delete the old image from Cloudinary
       if (existingPost.publicId) {
@@ -102,8 +107,9 @@ const updateBlogPost = async (req, res) => {
       updateFields.coverImage = uploadedImage.secure_url;
       updateFields.publicId = uploadedImage.public_id;
     }
+    */
 
-    //  Update the blog post in the database
+    // ! Update the blog post in the database
     const updatedPost = await Blog.findByIdAndUpdate(
       id,
       updateFields,
@@ -118,7 +124,7 @@ const updateBlogPost = async (req, res) => {
 };
 
 
-//   delete blog 
+// !  delete blog 
 
 const deleteBlogPost = async (req, res) => {
   try {

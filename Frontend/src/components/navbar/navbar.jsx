@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaWhatsapp, FaQrcode, FaUser, FaShoppingCart, FaSearch } from 'react-icons/fa';
-import LoginDialog from "@/components/common/LoginDialog";
 import CartDrawer from "@/components/common/CartDrawer";
-import { useCart } from "@/lib/cart/CartContext";
+import { useCart } from "@/context/useCart";
 import { useAuth } from "@/lib/auth/AuthContext";
 
 const WHATSAPP_URL = 'https://wa.me/919999999999'; // TODO: replace with your official number
@@ -13,7 +12,7 @@ const productCategories = [
   { 
     name: "Shop All", 
     imageUrl: "https://images.unsplash.com/photo-1709976142774-ce1ef41a8378?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D", 
-    link: "/product" 
+    link: "/most-loved-bestsellers" 
   },
   { 
     name: "L Carnitine", 
@@ -101,7 +100,7 @@ const ProductDropdown = ({ products, isVisible, navigate }) => {
             className="flex flex-col items-center p-2 rounded-lg hover:bg-gray-100 transition cursor-pointer"
           >
             <div className="w-12 h-12 mb-1 rounded-md overflow-hidden flex items-center justify-center">
-                {/* 🛑 RE-INSERTED IMAGE TAG HERE */}
+                {/* RE-INSERTED IMAGE TAG HERE */}
                 <img 
                     src={product.imageUrl} // Reads the URL from your productCategories array
                     alt={product.name} 
@@ -125,7 +124,7 @@ const ProductDropdown = ({ products, isVisible, navigate }) => {
 
 const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
-  const [loginOpen, setLoginOpen] = useState(false);
+
   const [cartOpen, setCartOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false); // State for dropdown visibility
   const [loginMenuOpen, setLoginMenuOpen] = useState(false);
@@ -136,7 +135,16 @@ const Navbar = () => {
   const { items } = useCart();
   const navigate = useNavigate();
   const cartCount = useMemo(() => items.reduce((n, i) => n + (i.qty || 1), 0), [items]);
-  const { isLoggedIn, role, loginAs, logout } = useAuth();
+  const { isLoggedIn, role, logout } = useAuth();
+
+  // Handle search submission
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?q=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery(''); // Clear the search input
+    }
+  };
 
   // Close login menu on outside click or ESC
   useEffect(() => {
@@ -210,7 +218,7 @@ const Navbar = () => {
 
           {/* Center - Search Bar - UNCHANGED */}
           <div className="flex-1 px-2 sm:px-4 lg:px-8">
-            <div className="relative w-full max-w-4xl mx-auto">
+            <form onSubmit={handleSearch} className="relative w-full max-w-4xl mx-auto">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <FaSearch className="h-4 w-4 sm:h-5 sm:w-5 text-gray-400" />
               </div>
@@ -221,7 +229,7 @@ const Navbar = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="block w-full pl-8 sm:pl-10 pr-3 py-2 border-0 rounded-lg bg-white text-black text-center placeholder-gray-500 outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 appearance-none text-sm sm:text-base"
               />
-            </div>
+            </form>
           </div>
 
           {/* Right - Icons - UNCHANGED */}
@@ -272,7 +280,7 @@ const Navbar = () => {
                         ref={firstMenuItemRef}
                         data-menuitem="true"
                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
-                        onClick={() => { setLoginOpen(true); setLoginMenuOpen(false); }}
+                        onClick={() => { setLoginMenuOpen(false); navigate('/login'); }}
                       >
                         User Login
                       </button>
@@ -296,6 +304,15 @@ const Navbar = () => {
                           Go to Admin
                         </button>
                       )}
+                      {role === 'user' && (
+                        <button
+                          data-menuitem="true"
+                          className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
+                          onClick={() => { navigate('/my-orders'); setLoginMenuOpen(false); }}
+                        >
+                          My Orders
+                        </button>
+                      )}
                       <button
                         data-menuitem="true"
                         className="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 focus:bg-gray-100 focus:outline-none"
@@ -305,6 +322,7 @@ const Navbar = () => {
                       </button>
                     </>
                   )}
+
                 </div>
               )}
             </span>
@@ -371,8 +389,7 @@ const Navbar = () => {
       </div>
       
       {/* Dialogs/Drawers - UNCHANGED */}
-  <LoginDialog open={loginOpen} onClose={() => setLoginOpen(false)} />
-      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+  <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
     </nav>
   );
 };

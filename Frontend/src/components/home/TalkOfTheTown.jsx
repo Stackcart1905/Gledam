@@ -1,5 +1,5 @@
-import React, { useMemo, useRef, useState } from 'react';
-import { useCart } from '@/lib/cart/CartContext';
+import React, { useRef, useState, useEffect } from 'react';
+import { useCart } from '@/context/useCart';
 import { useNavigate } from 'react-router-dom';
 import { getProducts } from '@/lib/data/products';
 
@@ -27,43 +27,59 @@ const TalkOfTheTown = () => {
   const qtyOf = (id) => cartItems.find(i => i.id === id)?.qty || 0;
   const navigate = useNavigate();
 
-  const all = useMemo(() => getProducts(), []);
-  const proteinItems = useMemo(
-    () => all.filter(p => p.category === 'Protein Powder').slice(0, 6).map(p => ({
-      id: p.id,
-      name: p.name,
-      rating: '4.5/5',
-      price: p.price,
-      img: p.imageUrl,
-      type: 'protein',
-    })),
-    [all]
-  );
-  const creatineItems = useMemo(
-    () => all.filter(p => p.category === 'Creatine').slice(0, 6).map(p => ({
-      id: p.id,
-      name: p.name,
-      rating: '4.6/5',
-      price: p.price,
-      img: p.imageUrl,
-      type: 'creatine',
-    })),
-    [all]
-  );
-  const multivitaminItems = useMemo(
-    () => all.filter(p => p.category === 'Multivitamins').slice(0, 6).map(p => ({
-      id: p.id,
-      name: p.name,
-      rating: '4.4/5',
-      price: p.price,
-      img: p.imageUrl,
-      type: 'multivitamin',
-    })),
-    [all]
-  );
+  const [proteinItems, setProteinItems] = useState([]);
+  const [creatineItems, setCreatineItems] = useState([]);
+  const [multivitaminItems, setMultivitaminItems] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const products = await getProducts();
+        
+        const protein = products.filter(p => p.category === 'Protein Powder').slice(0, 6).map(p => ({
+          id: p.id,
+          name: p.name,
+          rating: '4.5/5',
+          price: p.price,
+          img: p.imageUrl,
+          type: 'protein',
+        }));
+        setProteinItems(protein);
+        
+        const creatine = products.filter(p => p.category === 'Creatine').slice(0, 6).map(p => ({
+          id: p.id,
+          name: p.name,
+          rating: '4.6/5',
+          price: p.price,
+          img: p.imageUrl,
+          type: 'creatine',
+        }));
+        setCreatineItems(creatine);
+        
+        const multivitamin = products.filter(p => p.category === 'Multivitamins').slice(0, 6).map(p => ({
+          id: p.id,
+          name: p.name,
+          rating: '4.4/5',
+          price: p.price,
+          img: p.imageUrl,
+          type: 'multivitamin',
+        }));
+        setMultivitaminItems(multivitamin);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Build bestseller: 3 of each category (protein, creatine, multivitamin), shuffled. If multivitamin missing, fill to 9 with protein/creatine.
   const bestsellerMixed = () => {
+    if (loading) return [];
     const take = (arr, n) => arr.slice(0, n);
     const bestProtein = take(proteinItems, 3);
     const bestCreatine = take(creatineItems, 3);
@@ -83,15 +99,10 @@ const TalkOfTheTown = () => {
     bestseller: bestsellerMixed(),
     creatine: creatineItems,
     protein: proteinItems,
+    multivitamin: multivitaminItems,
   };
 
   // Keep original card sizing
-
-  const scrollBy = (delta) => {
-    const el = trackRef.current;
-    if (!el) return;
-    el.scrollBy({ left: delta, behavior: 'smooth' });
-  };
 
   // Auto-scroll removed per requirement. Manual scroll only.
 
@@ -128,50 +139,55 @@ const TalkOfTheTown = () => {
 
         {/* Slider with hidden controls */}
         <div className="relative">
-
-          <div
-            ref={trackRef}
-            className="flex gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory"
-            style={{ scrollBehavior: 'smooth' }}
-          >
-            {itemsByCategory[active].map((item, idx) => {
-              const baseWidth = 140; // px
-              const step = 20; // px increase per card
-              const width = baseWidth + idx * step;
-              const height = 400; // fixed equal height for all product images
-              return (
-                <div key={item.id} className="snap-start" style={{ minWidth: width + 160 }}>
-                  <div className="border border-gray-200 rounded-lg overflow-hidden">
-                    <div className="bg-gray-100 flex items-center justify-center" style={{ width: '100%', height }}>
-                      {item.img ? (
-                        <img
-                          src={item.img}
-                          alt={item.name}
-                          style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-gray-200" />
-                      )}
-                    </div>
-                    <div className="p-3">
-                      <div className="text-sm font-semibold text-black line-clamp-1">{item.name}</div>
-                      <div className="text-xs text-gray-500 mt-1">Rating: {item.rating}</div>
-                      <div className="text-sm font-bold text-black mt-1">₹{item.price}</div>
-                      <button
-                        className="mt-2 w-full !text-black text-sm font-semibold py-2 rounded-md focus:outline-none hover:opacity-80 transition-opacity border-none"
-                        style={{ backgroundColor: '#CCFF00', color: '#000000' }}
-                        onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.img })}
-                      >
-                        {qtyOf(item.id) > 0 ? `${qtyOf(item.id)} added` : 'Add to cart'}
-                      </button>
+          {loading ? (
+            <div className="flex justify-center items-center h-64">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            </div>
+          ) : (
+            <div
+              ref={trackRef}
+              className="flex gap-6 overflow-x-auto no-scrollbar snap-x snap-mandatory"
+              style={{ scrollBehavior: 'smooth' }}
+            >
+              {itemsByCategory[active].map((item, idx) => {
+                const baseWidth = 140; // px
+                const step = 20; // px increase per card
+                const width = baseWidth + idx * step;
+                const height = 400; // fixed equal height for all product images
+                return (
+                  <div key={item.id} className="snap-start" style={{ minWidth: width + 160 }}>
+                    <div className="border border-gray-200 rounded-lg overflow-hidden">
+                      <div className="bg-gray-100 flex items-center justify-center" style={{ width: '100%', height }}>
+                        {item.img ? (
+                          <img
+                            src={item.img}
+                            alt={item.name}
+                            style={{ height: '100%', width: 'auto', objectFit: 'contain' }}
+                            loading="lazy"
+                            referrerPolicy="no-referrer"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-200" />
+                        )}
+                      </div>
+                      <div className="p-3">
+                        <div className="text-sm font-semibold text-black line-clamp-1">{item.name}</div>
+                        <div className="text-xs text-gray-500 mt-1">Rating: {item.rating}</div>
+                        <div className="text-sm font-bold text-black mt-1">₹{item.price}</div>
+                        <button
+                          className="mt-2 w-full !text-black text-sm font-semibold py-2 rounded-md focus:outline-none hover:opacity-80 transition-opacity border-none"
+                          style={{ backgroundColor: '#CCFF00', color: '#000000' }}
+                          onClick={() => addItem({ id: item.id, name: item.name, price: item.price, image: item.img })}
+                        >
+                          {qtyOf(item.id) > 0 ? `${qtyOf(item.id)} added` : 'Add to cart'}
+                        </button>
+                      </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* View All */}

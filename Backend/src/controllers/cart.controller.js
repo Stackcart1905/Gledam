@@ -1,5 +1,5 @@
 import Cart from  "../models/cartSchema.model.js"
-import Product from "../models/productSchema.js";
+import Product from "../models/Product.js";
 
 // add product to cart 
 
@@ -7,7 +7,7 @@ const addToCart = async(req , res) => {
     try {
         const {userId} = req.params ; 
 
-        const {productId , quantity} = req.body ; 
+        const {productId , quantity, couponCode, discountAmount} = req.body ; 
 
         if(!productId  ) {
             return res.status(400).json({success : false , message : "Please provide productId "}) ; 
@@ -29,6 +29,8 @@ const addToCart = async(req , res) => {
              cart = new Cart({
                 user : userId , 
                 products : [{product : productId , quantity : quantity || 1}] , 
+                couponCode: couponCode || null,
+                discountAmount: discountAmount || 0
             })
         } else {
             // check if product already exist in cart 
@@ -42,11 +44,30 @@ const addToCart = async(req , res) => {
                     quantity : quantity || 1 
                 }) ; 
             }
+            
+            // Update coupon code if provided
+            if (couponCode !== undefined) {
+                cart.couponCode = couponCode;
+            }
+            if (discountAmount !== undefined) {
+                cart.discountAmount = discountAmount;
+            }
 
         }
         await cart.save() ; 
 
-        res.status(200).json(cart)
+        // Transform cart data to match frontend expectations
+        const transformedCart = {
+            _id: cart._id,
+            user: cart.user,
+            products: cart.products.map(item => ({
+                product: item.product,
+                quantity: item.quantity
+            })),
+            createdAt: cart.createdAt,
+            updatedAt: cart.updatedAt
+        };
+        res.status(200).json(transformedCart)
     }
 
     catch(error) {
@@ -70,7 +91,20 @@ const getCart = async(req,res) => {
             }) ; 
         } ; 
 
-        res.status(200).json(cart)
+        // Transform cart data to match frontend expectations
+        const transformedCart = {
+            _id: cart._id,
+            user: cart.user,
+            products: cart.products.map(item => ({
+                product: item.product,
+                quantity: item.quantity
+            })),
+            couponCode: cart.couponCode,
+            discountAmount: cart.discountAmount,
+            createdAt: cart.createdAt,
+            updatedAt: cart.updatedAt
+        };
+        res.status(200).json(transformedCart)
     }catch(error) {
         console.error("Error getting cart:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -104,7 +138,18 @@ const updateCartItem = async(req , res) => {
         }
         await cart.save() ; 
 
-        res.status(200).json(cart) ; 
+        // Transform cart data to match frontend expectations
+        const transformedCart = {
+            _id: cart._id,
+            user: cart.user,
+            products: cart.products.map(item => ({
+                product: item.product,
+                quantity: item.quantity
+            })),
+            createdAt: cart.createdAt,
+            updatedAt: cart.updatedAt
+        };
+        res.status(200).json(transformedCart) ; 
     }catch(error) {
         console.error("Error updating cart item:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" });
@@ -126,7 +171,18 @@ const removeFromCart = async(req , res) => {
         cart.products = cart.products.filter((item) => item.product.toString() !== productId) ;
         
         await cart.save() ; 
-        res.status(200).json(cart) ; 
+        // Transform cart data to match frontend expectations
+        const transformedCart = {
+            _id: cart._id,
+            user: cart.user,
+            products: cart.products.map(item => ({
+                product: item.product,
+                quantity: item.quantity
+            })),
+            createdAt: cart.createdAt,
+            updatedAt: cart.updatedAt
+        };
+        res.status(200).json(transformedCart) ; 
      }catch(error) {
         console.error("Error removing from cart:", error);
         res.status(500).json({ success: false, message: "Internal Server Error" }); 
@@ -150,9 +206,20 @@ const clearCart = async(req , res) => {
         cart.products = [] ; 
         await cart.save() ; 
 
+        // Transform cart data to match frontend expectations
+        const transformedCart = {
+            _id: cart._id,
+            user: cart.user,
+            products: cart.products.map(item => ({
+                product: item.product,
+                quantity: item.quantity
+            })),
+            createdAt: cart.createdAt,
+            updatedAt: cart.updatedAt
+        };
         return res.status(200).json({
             message : "Cart cleared successfully" ,
-            cart : cart , 
+            cart : transformedCart , 
         })
     }catch(error) {
         console.error("Error clearing cart:", error);
@@ -161,4 +228,41 @@ const clearCart = async(req , res) => {
 }
 
 
-export {addToCart , getCart , updateCartItem , removeFromCart , clearCart} ;
+const applyCoupon = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const { couponCode, discountAmount } = req.body;
+
+        let cart = await Cart.findOne({ user: userId });
+
+        if (!cart) {
+            return res.status(404).json({ success: false, message: "Cart not found" });
+        }
+
+        cart.couponCode = couponCode;
+        cart.discountAmount = discountAmount;
+        
+        await cart.save();
+
+        // Transform cart data to match frontend expectations
+        const transformedCart = {
+            _id: cart._id,
+            user: cart.user,
+            products: cart.products.map(item => ({
+                product: item.product,
+                quantity: item.quantity
+            })),
+            couponCode: cart.couponCode,
+            discountAmount: cart.discountAmount,
+            createdAt: cart.createdAt,
+            updatedAt: cart.updatedAt
+        };
+        
+        res.status(200).json(transformedCart);
+    } catch (error) {
+        console.error("Error applying coupon:", error);
+        res.status(500).json({ success: false, message: "Internal Server Error" });
+    }
+};
+
+export {addToCart , getCart , updateCartItem , removeFromCart , clearCart, applyCoupon} ;

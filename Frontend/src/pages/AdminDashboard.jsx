@@ -1,5 +1,6 @@
-import React, { useMemo, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { CATEGORIES, addProduct, deleteProduct, getInventoryAnalytics, getProducts, updateProduct } from '@/lib/data/products';
+import BlogManagement from '@/components/AdminDashboard/BlogManagement';
 
 const Stat = ({ label, value }) => (
   <div className="bg-white/5 border border-white/10 rounded-xl p-4">
@@ -86,8 +87,32 @@ const ProductRow = ({ p, onUpdate, onDelete }) => {
 
 export default function AdminDashboard() {
   const [refreshKey, setRefreshKey] = useState(0);
-  const products = useMemo(()=> getProducts(), [refreshKey]);
-  const analytics = useMemo(()=> getInventoryAnalytics(), [refreshKey]);
+  const [products, setProducts] = useState([]);
+  const [analytics, setAnalytics] = useState({
+    totalProducts: 0,
+    totalStock: 0,
+    inventoryValue: 0,
+    avgPrice: 0,
+    byCategory: {},
+    lowStock: [],
+  });
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [productsData, analyticsData] = await Promise.all([
+          getProducts(),
+          getInventoryAnalytics()
+        ]);
+        setProducts(productsData);
+        setAnalytics(analyticsData);
+      } catch (error) {
+        console.error('Failed to fetch data:', error);
+      }
+    };
+
+    fetchData();
+  }, [refreshKey]);
   
 
   const [newItem, setNewItem] = useState({
@@ -179,6 +204,9 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
+
+        {/* Blog Management */}
+        <BlogManagement />
 
         {/* Product table */}
         <div className="mt-8 bg-white/5 border border-white/10 rounded-xl p-4 overflow-auto">

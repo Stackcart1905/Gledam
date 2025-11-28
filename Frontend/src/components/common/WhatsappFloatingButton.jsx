@@ -10,8 +10,8 @@ const WhatsappFloatingButton = () => {
       aria-label="Chat on WhatsApp"
       style={{
         position: 'fixed',
-        right: '2rem',
-        bottom: '2rem',
+        left: '2rem',
+        bottom: '1rem',
         zIndex: 1000,
         background: '#25D366',
         borderRadius: '50%',

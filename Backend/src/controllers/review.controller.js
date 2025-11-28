@@ -1,5 +1,5 @@
 import Review from "../models/reviewSchema.js" ; 
-import Product from "../models/productSchema.js" ; 
+import Product from "../models/Product.js" ; 
 
 // add review 
 

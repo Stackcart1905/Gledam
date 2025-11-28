@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { getProductsByCategory } from '@/lib/data/products';
-import { useCart } from '@/lib/cart/CartContext';
+import { useCart } from '@/context/useCart';
 
 const ProductCard = ({ p, qtyOf, addItem }) => (
   <div className="bg-white border border-gray-200 rounded-xl overflow-hidden">
@@ -32,7 +32,33 @@ const ProductCard = ({ p, qtyOf, addItem }) => (
 export default function CategoryProducts({ category }) {
   const { addItem, items: cartItems } = useCart();
   const qtyOf = (id) => cartItems.find(i => i.id === id)?.qty || 0;
-  const products = getProductsByCategory(category);
+  const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const productsData = await getProductsByCategory(category);
+        setProducts(productsData);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, [category]);
+
+  if (loading) {
+    return (
+      <div className="bg-white text-black min-h-[70vh] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white text-black min-h-[70vh]">
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -41,7 +67,7 @@ export default function CategoryProducts({ category }) {
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mt-6">
           {products.map(p => <ProductCard key={p.id} p={p} qtyOf={qtyOf} addItem={addItem} />)}
         </div>
-  {products.length === 0 && (
+        {products.length === 0 && (
           <p className="text-gray-500 mt-8">No items yet in this category. Try adding some from the Admin Dashboard.</p>
         )}
       </div>

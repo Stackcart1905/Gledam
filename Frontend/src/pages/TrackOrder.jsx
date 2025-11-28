@@ -122,7 +122,7 @@ const TrackOrder = () => {
         {/* ================================================================= */}
       </div>
 
-      <section className="w-full bg-white mt-12 text-black">
+      {/* <section className="w-full bg-white mt-12 text-black">
         <div className="max-w-7xl mx-auto px-6 py-6">
           <hr className="mt-8 border-t border-black w-full" />
           <div className="mt-6 flex justify-center">
@@ -157,9 +157,9 @@ const TrackOrder = () => {
             </button>
           </div>
         </div>
-      </section>
+      </section> */}
 
-      <Footer />
+ 
     </main>
   );
 };

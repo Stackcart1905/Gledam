@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { useCart } from '@/lib/cart/CartContext';
+import { useCart } from '@/context/useCart';
 import Footer from '@/components/footer/Footer';
 
 // Simple demo data (can be replaced with real products later)

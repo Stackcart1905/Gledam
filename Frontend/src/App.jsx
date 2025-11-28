@@ -1,18 +1,17 @@
-import { useState, useEffect } from 'react'; // Import useEffect for scroll logic
-import { Routes, Route, useLocation } from 'react-router-dom'; // Import useLocation for scroll logic
-import reactLogo from './assets/react.svg';
-import viteLogo from '/vite.svg';
+import { useEffect } from 'react';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import './App.css';
 
-// Component Imports
+// Components
 import Navbar from './components/navbar/navbar';
-import Footer from './components/footer/Footer'; // 👈 ADDED: Import the Footer
+import Footer from './components/footer/Footer';
 import WhatsappFloatingButton from './components/common/WhatsappFloatingButton';
+import Chatbot from './components/common/Chatbot';
 
-// Page Imports
+// Pages
 import Home from '@/pages/Home';
 import Authenticator from '@/pages/Authenticator';
-import About from '@/components/about/About'; // Note: This should ideally be '@/pages/About' for consistency
+import About from '@/components/about/About';
 import TrendingSupplement from '@/pages/TrendingSupplement';
 import WellnessPage from '@/pages/Wellness';
 import MostLovedBestsellersPage from '@/pages/MostLovedBestsellers';
@@ -21,44 +20,46 @@ import Blogs from "./pages/Blogs";
 import TrackOrder from "./pages/TrackOrder";
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsConditions from './pages/TermsConditions';
-import GledamCash from './pages/GledamCash'; 
+import GledamCash from './pages/GledamCash';
 import ReferAndEarn from './pages/ReferAndEarn';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminLogin from './pages/AdminLogin';
+import UserLogin from './pages/UserLogin';
+import Signup from './pages/Signup';
+import VerifyEmail from './pages/VerifyEmail';
 import CategoryProducts from './pages/CategoryProducts';
+import AuthTest from './pages/AuthTest';
+import MyOrders from './pages/MyOrders';
+import Checkout from './pages/Checkout';
+import OrderConfirmation from './pages/OrderConfirmation';
+import OrderDetails from './pages/OrderDetails';
+import SearchResults from './pages/SearchResults';
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+import TestProducts from "./TestProducts";
 
-// Custom Hook for Scroll-to-Top functionality (Inline to avoid a new file)
+// 👇 Custom hook to scroll to top on route change
 const useScrollToTop = () => {
-    // Gets the current route path
-    const { pathname } = useLocation();
+  const { pathname } = useLocation();
 
-    useEffect(() => {
-        // Scrolls the window to the top (0, 0) whenever the pathname changes
-        window.scrollTo(0, 0);
-    }, [pathname]); // Re-run effect only when 'pathname' changes
-    
-    return null;
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
 };
 
-
 function App() {
-  const [count, setCount] = useState(0);
-
-  // 1. 💥 CALL THE SCROLL HOOK HERE 💥
-  // This must be inside the component function but outside the JSX return block.
-  useScrollToTop(); 
+  useScrollToTop();
 
   return (
-    // You should wrap everything in <BrowserRouter> in your index.js, 
-    // but the layout below is correct for the App component.
     <>
       <Navbar />
-      
-      {/* Main content area */}
-      <main className='min-h-[80vh]'> 
+      <main className="min-h-[80vh]">
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/authenticator" element={<Authenticator />} />
+          <Route path="/login" element={<UserLogin />} />
+          <Route path="/signup" element={<Signup />} />
+          <Route path="/verify-email" element={<VerifyEmail />} />
           <Route path="/about" element={<About />} />
           <Route path="/trending" element={<TrendingSupplement />} />
           <Route path="/wellness" element={<WellnessPage />} />
@@ -69,27 +70,32 @@ function App() {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
           <Route path="/terms-conditions" element={<TermsConditions />} />
           <Route path="/gledam-cash" element={<GledamCash />} />
-          
           <Route path="/refer-earn" element={<ReferAndEarn />} />
           <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/admin-login" element={<AdminLogin />} />
-
-          {/* Category product listings */}
+          <Route path="/auth-test" element={<AuthTest />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/order-confirmation/:orderId" element={<OrderConfirmation />} />
+          <Route path="/order-details/:orderId" element={<OrderDetails />} />
+          <Route path="/my-orders" element={<MyOrders />} />
+          <Route path="/search" element={<SearchResults />} />
           <Route path="/creatine" element={<CategoryProducts category="Creatine" />} />
-          <Route path="/prowhey" element={<CategoryProducts category="Protein Powder" />} />
+          <Route path="/protein" element={<CategoryProducts category="Protein Powder" />} />
           <Route path="/massgainer" element={<CategoryProducts category="Mass Gainer" />} />
           <Route path="/multivitamins" element={<CategoryProducts category="Multivitamins" />} />
           <Route path="/bcaa" element={<CategoryProducts category="BCAA" />} />
           <Route path="/peanutbutter" element={<CategoryProducts category="Peanut Butter" />} />
-          
+             <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/test-products" element={<TestProducts />} />
         </Routes>
       </main>
-      
-      
 
+      <Footer />
       <WhatsappFloatingButton />
+      <Chatbot />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
