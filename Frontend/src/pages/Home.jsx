@@ -33,8 +33,6 @@ const Home = () => {
       <BrandMarqueeStrip />
       <Gledamgram />
   
-  {/* <ChatbotFloatingLogo onClick={() => setChatOpen(true)} /> */}
-  {/* <ChatbotPanel open={chatOpen} onClose={() => setChatOpen(false)} /> */}
     </>
   );
 };

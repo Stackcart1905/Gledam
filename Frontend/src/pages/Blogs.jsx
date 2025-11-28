@@ -213,7 +213,7 @@ const Blogs = () => {
           )}
         </aside>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </main>
   );
 };
